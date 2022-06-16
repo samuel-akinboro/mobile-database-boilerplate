@@ -1,21 +1,27 @@
+require('./models/User')
 const express = require('express');
+const mongoose = require('mongoose');
+const authRoute = require('./routes/authRoute');
+const bodyParser = require('body-parser');
+
+// port 
+const PORT = 3000;
+
+// initialize app
 const app = express();
-const mongoose = require("mongoose");
+
+// middleware
+app.use(bodyParser.json())
+app.use(authRoute)
 
 // database connection
 const mongoUri = "mongodb+srv://admin:admin123@cluster0.tyagn.mongodb.net/?retryWrites=true&w=majority"
+mongoose.connect(mongoUri);
+mongoose.connection.on('connected', ()=> console.log('connected to database'))
+mongoose.connection.on('error', (err)=> console.error("Error connecting to database", err))
 
-mongoose.connect(mongoUri)
-mongoose.connection.on('connected', ()=>{
-  console.log('Connected to mongo instance')
+app.get('/', (req, res)=> {
+  res.send("working")
 })
 
-mongoose.connection.on('error', (err)=>{
-  console.error('Error connecting to mongo instance', err)
-})
-
-app.get("/", (req, res) => {
-  res.send("Hello there")
-})
-
-app.listen(3000, ()=> console.log("server runing on port 3000"))
+app.listen(PORT, ()=> console.log('server running on port ' + PORT))
